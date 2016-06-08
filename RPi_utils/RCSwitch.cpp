@@ -518,12 +518,14 @@ bool RCSwitch::receiveProtocol1(unsigned int changeCount){
       RCSwitch::nReceivedBitlength = changeCount / 2;
       RCSwitch::nReceivedDelay = delay;
       RCSwitch::nReceivedProtocol = 1;
-      pushEvent(code);
+      if(code!=0){
+        pushEvent(code);
+      }
     }
 
     if (code == 0){
         return false;
-    }else if (code != 0){
+    }else{
         return true;
     }
 
@@ -555,12 +557,14 @@ bool RCSwitch::receiveProtocol2(unsigned int changeCount){
       RCSwitch::nReceivedBitlength = changeCount / 2;
       RCSwitch::nReceivedDelay = delay;
       RCSwitch::nReceivedProtocol = 2;
-      pushEvent(code);
+      if(code!=0){
+        pushEvent(code);
+      }
     }
 
     if (code == 0){
         return false;
-    }else if (code != 0){
+    }else{
         return true;
     }
 
