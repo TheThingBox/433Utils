@@ -57,6 +57,7 @@ class RCSwitch {
 
   public:
     static unsigned long popEvent();
+    static void pushEvent(unsigned long);
 
     RCSwitch();
 
@@ -105,8 +106,6 @@ class RCSwitch {
     static unsigned int nReceivedDelay;
     static unsigned int nReceivedProtocol;
     static unsigned int timings[RCSWITCH_MAX_CHANGES];
-
-    static void pushEvent(unsigned long);
 
     static unsigned long events[RCSWITCH_MAX_EVENTS];
     static int eventsHead;
