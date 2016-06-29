@@ -13,11 +13,7 @@ by @justy to provide a handy RF code sniffer
 #include <stdio.h>
 #include <ctype.h>
 #include <time.h>
-#include <pthread.h>
 #include <unistd.h>
-
-unsigned long currentCode = DEFAULT_CODE;
-time_t firstCodeReceivedTime, lastCodeReceivedTime;
 
 /*
 * Usage : ./RFSniffer -b<MQTT Broker> -p<MQTT Port> -t<MQTT Topic>
@@ -58,60 +54,27 @@ int main(int argc, char *argv[]) {
 
 	RCSwitch mySwitch;
 	MqttWrapper *mqtt;
-	bool reading = false;
-	pthread_t threadedListenerThread;
-
 	mqtt = new MqttWrapper(SNIFFER_MQTT_ID, mqttTopic, mqttBroker, atoi(mqttPort));
 	mySwitch.enableReceive(PIN);
 
 	while(1)
 	{
-		if(!reading)
-		{
-			currentCode = RCSwitch::popEvent();
-			firstCodeReceivedTime = lastCodeReceivedTime = time(0);
-			if(pthread_create(&threadedListenerThread, NULL, threadedListener, NULL) == 0)
-			{
-				reading = true;
-			}
-		}
-		else
-		{
-			sleep(THRESHOLD);
-			time_t now = time(0);
-			if(now - lastCodeReceivedTime > THRESHOLD)
-			{
-				RCSwitch::pushEvent(0);
-				
-				reading = false;
-			
-				char msg[20], codeStr[20];
-				char *topic;
+		unsigned long currentCode = RCSwitch::popEvent();
+		time_t now = time(0);
+	
+		char msg[20], codeStr[20];
+		char *topic;
 
-				topic = (char*)malloc(sizeof(char) * (strlen(mqttTopic) + 20));
+		topic = (char*)malloc(sizeof(char) * (strlen(mqttTopic) + 20));
 
-				sprintf(codeStr, "%i", currentCode);
-				strcpy(topic, mqttTopic);
-				strcat(topic, "/");
-				strcat(topic, codeStr);
-				sprintf(msg, "%i", lastCodeReceivedTime - firstCodeReceivedTime);
+		sprintf(codeStr, "%i", currentCode);
+		strcpy(topic, mqttTopic);
+		strcat(topic, "/");
+		strcat(topic, codeStr);
+		sprintf(msg, "%i", now);
 
-				mqtt->send_message(msg, topic);
-				free(topic);
-				sleep(1);
-			}
-		}
+		mqtt->send_message(msg, topic);
+		free(topic);
 	}
 	return 0;
-};
-
-void *threadedListener(void *unused){
-	unsigned long code = 1;
-	while(code != 0){
-		code = RCSwitch::popEvent();
-		if(code == currentCode)
-		{
-			lastCodeReceivedTime = time(0);
-		}
-	}
 };
