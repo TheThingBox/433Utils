@@ -10,7 +10,8 @@ the library provided by the arduino.
 ## Usage
 
 First you have to install the [wiringpi](https://projects.drogon.net/raspberry-pi/wiringpi/download-and-install/) library.
-After that you can compile the example program *send* by executing *make*. 
+After that you have to execute : `apt-get install libmosquittopp-dev`.
+Now you can compile the example program *send* by executing *make*. 
 You may want to change the used GPIO pin before compilation of the codesend.cpp source file.
 
 ## Note
